@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#123e2e"><title>APPLE RUN — Modern Snake</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+:root{color-scheme:dark;--forest:#0d2a20;--leaf:#b6f36b;--cream:#f5ffe8;--muted:#a7bfae}
+*{box-sizing:border-box}body{margin:0;min-height:100svh;background:radial-gradient(circle at 50% 0%,#315f40 0%,#143e2c 37%,#09251d 100%);color:var(--cream);font-family:'DM Sans',system-ui,sans-serif;display:grid;place-items:center;padding:25px 14px}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;background-image:radial-gradient(#b3ef9e 1px,transparent 1px);background-size:25px 25px;mask-image:linear-gradient(transparent,#000)}
+.shell{width:min(100%,620px);position:relative;z-index:1}.topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;gap:14px}.brand{display:flex;align-items:center;gap:12px}.brand-icon{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:#d7fc9d;color:#173c25;box-shadow:0 6px 24px #070d0844;font-size:25px}.eyebrow{font-size:10px;letter-spacing:.24em;font-weight:800;color:#c5e6b6}.brand h1{font-family:'Space Grotesk',sans-serif;font-size:26px;letter-spacing:-.065em;margin:1px 0 0}.pill{font-size:11px;letter-spacing:.08em;font-weight:800;border:1px solid #ffffff30;border-radius:99px;padding:10px 13px;color:#d2ecca;background:#ffffff0c}
+.card{background:linear-gradient(150deg,#244d35,#123b2b 72%);border:1px solid #c6f4b330;padding:17px;border-radius:29px;box-shadow:0 30px 75px #061e19b5,inset 0 1px #ffffff1c}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.stat{background:#0e3025a8;border:1px solid #ffffff16;padding:12px 15px;border-radius:17px;min-height:70px}.stat small{font-size:10px;letter-spacing:.13em;font-weight:800;color:#b4cdb6}.stat strong{display:block;font-family:'Space Grotesk';font-size:28px;line-height:1.1;margin-top:5px}.stat strong.apple{color:#f7bd76}.stat strong.best{color:#d2fd9d}
+.stage{position:relative;border-radius:18px;overflow:hidden;border:1px solid #c9ffb754;background:#85bb70;box-shadow:inset 0 0 0 1px #0001;touch-action:none}canvas{display:block;width:100%;aspect-ratio:1;image-rendering:auto}
+.overlay{position:absolute;inset:0;background:#0a261dc9;backdrop-filter:blur(6px);display:grid;place-items:center;padding:22px;text-align:center;transition:opacity .2s}.overlay.hidden{opacity:0;pointer-events:none}.modal{max-width:330px}.orb{display:grid;place-items:center;width:72px;height:72px;margin:0 auto 15px;border-radius:25px;background:#d6fa9b;color:#183526;font-size:36px;transform:rotate(-7deg);box-shadow:0 12px 35px #0004}.modal h2{font-family:'Space Grotesk';font-size:32px;margin:0 0 9px;letter-spacing:-.06em}.modal p{font-size:14px;line-height:1.6;color:#c4d9c5;margin:0 0 24px}.primary{font:800 13px 'DM Sans',sans-serif;cursor:pointer;background:#d2fb92;border:none;border-radius:14px;color:#153524;padding:15px 26px;box-shadow:0 7px 0 #95c260,0 13px 22px #0005;transition:transform .12s,box-shadow .12s}.primary:hover{background:#e1ffae}.primary:active{transform:translateY(5px);box-shadow:0 2px 0 #95c260}
+.actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}.hint{font-size:12px;color:#c9dfc6}.hint b{color:#f0ffd9}.buttons{display:flex;gap:8px}.iconbtn{border:1px solid #ffffff2b;background:#ffffff14;color:#eaffdf;border-radius:12px;min-width:42px;height:42px;cursor:pointer;font-size:19px}.iconbtn:hover{background:#ffffff27}
+.footer{text-align:center;color:#aec7ae;margin:18px 0 0;font-size:11px;letter-spacing:.025em}.footer span{color:#d7f8ac}
+.dpad{display:none;margin:17px auto 0;grid-template-columns:repeat(3,54px);grid-template-rows:repeat(2,49px);gap:7px;justify-content:center}.dpad button{font-size:21px;border-radius:15px;border:1px solid #d7ffbf55;background:#ffffff18;color:#f3ffe8;touch-action:manipulation}.dpad button:active{background:#cefa8e;color:#123624}.dpad .up{grid-column:2}.dpad .left{grid-column:1;grid-row:2}.dpad .down{grid-column:2;grid-row:2}.dpad .right{grid-column:3;grid-row:2}
+@media(max-width:600px){body{padding:14px 10px}.topline{margin-bottom:14px}.brand h1{font-size:23px}.card{padding:11px;border-radius:23px}.stats{gap:7px}.stat{padding:10px 11px;min-height:61px}.stat strong{font-size:23px}.hint{font-size:11px}.dpad{display:grid}.footer{margin-top:12px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="topline"><div class="brand"><div class="brand-icon">🍎</div><div><div class="eyebrow">A LITTLE ARCADE MOMENT</div><h1>APPLE RUN<span style="color:#cefb91">.</span></h1></div></div><div class="pill">● CLASSIC REIMAGINED</div></header>
+  <section class="card" aria-label="Snake game">
+    <div class="stats"><div class="stat"><small>SCORE</small><strong id="score">00</strong></div><div class="stat"><small>BEST SCORE</small><strong class="best" id="best">00</strong></div><div class="stat"><small>APPLES EATEN</small><strong class="apple" id="apples">00</strong></div></div>
+    <div class="stage" id="stage"><canvas id="board" width="600" height="600" aria-label="Snake playfield"></canvas>
+      <div class="overlay" id="overlay"><div class="modal"><div class="orb" id="orb">🐍</div><h2 id="heading">Ready to slither?</h2><p id="description">Collect juicy apples, grow your red snake, and beat your high score. Just don't eat your own tail.</p><button class="primary" id="play">LET'S PLAY →</button></div></div>
+    </div>
+    <div class="actions"><div class="hint"><b>↕ ↔ / WASD</b> to move · <b>SPACE</b> to pause<br>Swipe or use the buttons on mobile</div><div class="buttons"><button class="iconbtn" id="pause" title="Pause / resume" aria-label="Pause or resume">⏸</button><button class="iconbtn" id="restart" title="Restart" aria-label="Restart">↻</button><button class="iconbtn" id="sound" title="Toggle sound" aria-label="Toggle sound">♫</button></div></div>
+    <div class="dpad" aria-label="Touch movement controls"><button class="up" data-dir="up" aria-label="Up">↑</button><button class="left" data-dir="left" aria-label="Left">←</button><button class="down" data-dir="down" aria-label="Down">↓</button><button class="right" data-dir="right" aria-label="Right">→</button></div>
+  </section><div class="footer">MADE FOR THE LOVE OF <span>ONE MORE ROUND ♡</span></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const size=20, cell=30, canvas=document.querySelector('#board'), ctx=canvas.getContext('2d');
+  const $=id=>document.getElementById(id);
+  const scoreEl=$('score'),bestEl=$('best'),applesEl=$('apples'),overlay=$('overlay');
+  const directions={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};
+  let snake,dir,nextDir,apple,score,apples,best=0,running=false,paused=false,dead=false,acc=0,last=0,muted=false,audio=null;
+  try{best=Number(localStorage.getItem('apple-run-best'))||0}catch(e){}
+  bestEl.textContent=String(best).padStart(2,'0');
+  function randomApple(){const free=[];for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(!snake.some(p=>p.x===x&&p.y===y))free.push({x,y});return free.length?free[Math.floor(Math.random()*free.length)]:null}
+  function sound(freq=500){if(muted)return;try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(freq*1.4,audio.currentTime+.09);g.gain.setValueAtTime(.075,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.13);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+.14)}catch(e){}}
+  function updateStats(){scoreEl.textContent=String(score).padStart(2,'0');bestEl.textContent=String(best).padStart(2,'0');applesEl.textContent=String(apples).padStart(2,'0')}
+  function reset(){snake=[{x:8,y:10},{x:7,y:10},{x:6,y:10}];dir={x:1,y:0};nextDir={...dir};score=0;apples=0;apple=randomApple();dead=false;paused=false;running=true;acc=0;last=0;$('pause').textContent='⏸';overlay.classList.add('hidden');updateStats()}
+  function show(title,body,emoji,label){$('heading').textContent=title;$('description').textContent=body;$('orb').textContent=emoji;$('play').textContent=label;overlay.classList.remove('hidden')}
+  function end(win=false){running=false;dead=true;sound(190);show(win?'You cleared the garden!':'Oh, snap!',win?'Every apple collected. You are unstoppable!':'You scored '+score+' points and ate '+apples+' apple'+(apples===1?'':'s')+'. Ready for another run?',win?'🏆':'💥','PLAY AGAIN →')}
+  function tick(){dir=nextDir;const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};const eating=apple&&head.x===apple.x&&head.y===apple.y;
+    if(head.x<0||head.y<0||head.x>=size||head.y>=size||snake.slice(0,eating?undefined:-1).some(p=>p.x===head.x&&p.y===head.y)){end();return}
+    snake.unshift(head);
+    if(eating){score+=10;apples++;sound(470+Math.min(550,apples*25));if(score>best){best=score;try{localStorage.setItem('apple-run-best',String(best))}catch(e){}}apple=randomApple();updateStats();if(!apple){end(true);return}}
+    else snake.pop();
+  }
+  function rounded(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
+  function render(t){ctx.clearRect(0,0,600,600);
+    const bg=ctx.createLinearGradient(0,0,600,600);bg.addColorStop(0,'#a5ce7f');bg.addColorStop(1,'#7bb671');ctx.fillStyle=bg;ctx.fillRect(0,0,600,600);
+    for(let y=0;y<size;y++)for(let x=0;x<size;x++){ctx.fillStyle=(x+y)%2===0?'#ffffff0d':'#163d2608';ctx.fillRect(x*cell,y*cell,cell,cell)}
+    ctx.fillStyle='#316c4540';for(let y=0;y<size;y++)for(let x=0;x<size;x++){ctx.beginPath();ctx.arc(x*cell+15,y*cell+15,1.15,0,Math.PI*2);ctx.fill()}
+    if(apple){const px=apple.x*cell+15,py=apple.y*cell+16+Math.sin(t/240)*1.5;ctx.save();ctx.shadowColor='#d12d3480';ctx.shadowBlur=15;ctx.fillStyle='#e63e43';ctx.beginPath();ctx.arc(px,py,10.8,0,Math.PI*2);ctx.fill();ctx.restore();ctx.fillStyle='#ff8585';ctx.beginPath();ctx.ellipse(px-4,py-4,2.5,3.3,-.6,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#62552d';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(px,py-9);ctx.lineTo(px+1,py-14);ctx.stroke();ctx.fillStyle='#317b38';ctx.beginPath();ctx.ellipse(px+5,py-13,5,2.7,-.45,0,Math.PI*2);ctx.fill()}
+    snake.forEach((s,i)=>{const pad=i===0?1.4:2.1,x=s.x*cell+pad,y=s.y*cell+pad,d=cell-2*pad;ctx.save();ctx.shadowColor=i===0?'#750d1765':'transparent';ctx.shadowBlur=i===0?10:0;ctx.fillStyle=i===0?'#ed454d':i%2===0?'#df343f':'#e83f47';rounded(x,y,d,d,9);ctx.restore();ctx.fillStyle='#ffffff25';rounded(x+4,y+3,d-8,4,3)});
+    if(snake.length){const h=snake[0],cx=h.x*cell+15,cy=h.y*cell+15;const side={x:-dir.y,y:dir.x};for(const sign of [-1,1]){const ex=cx+dir.x*5+side.x*sign*6,ey=cy+dir.y*5+side.y*sign*6;ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(ex,ey,3.65,0,Math.PI*2);ctx.fill();ctx.fillStyle='#233528';ctx.beginPath();ctx.arc(ex+dir.x*.8,ey+dir.y*.8,1.7,0,Math.PI*2);ctx.fill()}}
+  }
+  function frame(time){if(!last)last=time;const delta=Math.min(time-last,100);last=time;if(running&&!paused){acc+=delta;const speed=Math.max(72,145-apples*3);while(acc>=speed&&running){tick();acc-=speed}}render(time);requestAnimationFrame(frame)}
+  function steer(key){const d=directions[key];if(!d)return;if(!running||paused)return;if(d.x===-dir.x&&d.y===-dir.y)return;nextDir=d}
+  function pause(){if(!running)return;paused=!paused;$('pause').textContent=paused?'▶':'⏸';if(paused)show('Taking a breather?','Your apples are right where you left them. Hop back in whenever you’re ready.','⏸','RESUME GAME →');else overlay.classList.add('hidden')}
+  $('play').addEventListener('click',()=>{if(running&&paused)pause();else reset()});
+  $('restart').addEventListener('click',reset);$('pause').addEventListener('click',pause);
+  $('sound').addEventListener('click',()=>{muted=!muted;$('sound').textContent=muted?'♪̸':'♫';$('sound').setAttribute('aria-label',muted?'Unmute':'Mute')});
+  document.addEventListener('keydown',e=>{const keys={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right'};if(keys[e.key]){e.preventDefault();steer(keys[e.key])}else if(e.code==='Space'){e.preventDefault();if(!running)reset();else pause()}else if(e.key==='Enter'&&!running)reset()});
+  document.querySelectorAll('[data-dir]').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();steer(b.dataset.dir)}));
+  let start=null;canvas.addEventListener('pointerdown',e=>{start={x:e.clientX,y:e.clientY}});canvas.addEventListener('pointerup',e=>{if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.max(Math.abs(dx),Math.abs(dy))>18)steer(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'));start=null});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&running&&!paused)pause()});
+  snake=[{x:8,y:10},{x:7,y:10},{x:6,y:10}];dir={x:1,y:0};nextDir={...dir};apple={x:13,y:10};score=0;apples=0;requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
